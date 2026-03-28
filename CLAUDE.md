@@ -93,6 +93,16 @@ $execution.customData.set("branch", "qualified");
 При ошибке или остановке воркфлоу — в Telegram-чат улетает сообщение с именем воркфлоу, нодой, текстом ошибки и ссылкой на execution.
 Каждый воркфлоу при деплое получает `"settings": {"errorWorkflow": "{N8N_ERROR_WORKFLOW_ID}"}`.
 
+## Технические особенности n8n
+- executeWorkflowTrigger: typeVersion 1 (не 1.1)
+- httpRequest: typeVersion 4.2, без credential — токен inline в headerParameters
+- HTTP-ноды обязательно: `options.response.response.responseFormat: "json"`
+- HTTP-ноды обязательно: `retryOnFail: true, maxTries: 3, waitBetweenTries: 2000`
+- Data Table нода: `n8n-nodes-base.dataTable` (с большой T), typeVersion 1
+- При добавлении нод: разносить по вертикали минимум на 150px
+- После PUT обновления entry-роутера — деактивировать/активировать для перерегистрации вебхука
+- amoCRM удаляет вебхуки после серии ошибок — при отладке проверять наличие
+
 ## Деплой
 Для деплоя использовать скрипт `scripts/deploy.js`:
 ```bash
