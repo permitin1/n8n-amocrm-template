@@ -1,0 +1,49 @@
+{
+  "name": "PROJECT | [UTIL] Error Handler → Telegram",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "error-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "=🚨 *Ошибка в N8N*\n\n*Воркфлоу:* {{ $json.workflow.name }} (ID: {{ $json.workflow.id }})\n*Нода:* {{ $json.execution.error.node.name }}\n*Ошибка:* {{ $json.execution.error.message }}\n*Время:* {{ $now.format('dd.MM.yyyy HH:mm:ss') }}\n\n[Открыть execution]({{ $env.N8N_URL }}/workflow/{{ $json.workflow.id }}/executions/{{ $json.execution.id }})",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram-send",
+      "name": "Telegram: отправить ошибку",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [480, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $env.TELEGRAM_CREDENTIAL_ID }}",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Telegram: отправить ошибку",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "active": true
+}
