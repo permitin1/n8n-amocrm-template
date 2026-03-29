@@ -1,6 +1,6 @@
 # n8n + amoCRM Automation Template
 
-Шаблон проекта для автоматизаций amoCRM через n8n.
+Шаблон проекта для автоматизаций amoCRM через n8n + микросервисы.
 
 ## Быстрый старт
 
@@ -84,6 +84,22 @@ docs/
 workflows/
   entry/                  <- entry-роутеры (вебхуки amoCRM)
   utils/                  <- утилиты (error handler и т.д.)
+services/
+  web/                    <- микросервис: веб-страницы клиента
+    server.js             <- Fastify сервер
+    routes/               <- роуты (по одному на BT-задачу типа service/both)
+    templates/            <- EJS шаблоны страниц
+    Dockerfile            <- контейнеризация
+    docker-compose.yml    <- запуск
 scripts/
-  init-amocrm-config.js  <- инициализация конфига amoCRM
+  deploy.js               <- деплой воркфлоу в n8n
+  init-amocrm-config.js   <- инициализация конфига amoCRM
 ```
+
+## Типы BT-задач
+
+| Тип | Что создаётся | Где деплоится |
+|-----|---------------|---------------|
+| **n8n** | workflow.json | N8N |
+| **service** | route + template | Docker-контейнер |
+| **both** | workflow.json + route + template | N8N + Docker |

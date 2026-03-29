@@ -1,0 +1,14 @@
+{
+  "name": "web-service",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "fastify": "^5.0.0",
+    "@fastify/view": "^10.0.0",
+    "ejs": "^3.1.10"
+  }
+}

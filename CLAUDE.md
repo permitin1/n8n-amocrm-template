@@ -1,11 +1,13 @@
 # CLAUDE.md
 
 ## Проект
-Автоматизации amoCRM через N8N. Каждая бизнес-задача — отдельная папка с ТЗ, воркфлоу и логом.
+Автоматизации amoCRM через N8N + микросервисы. Каждая бизнес-задача — отдельная папка с ТЗ, воркфлоу и логом.
 
 ## Стек
 - N8N Community Edition (self-hosted)
 - amoCRM API v4
+- Fastify (микросервис для веб-страниц: лендинги, выбор мессенджера и т.д.)
+- Docker (деплой сервиса)
 - Переменные окружения из .env
 
 ## Переменные окружения
@@ -18,7 +20,7 @@
 - TELEGRAM_BOT_TOKEN — токен Telegram-бота для уведомлений
 - TELEGRAM_CHAT_ID — ID чата/группы для уведомлений об ошибках
 
-## Архитектура воркфлоу
+## Архитектура
 
 ```
 workflows/entry/          ← входные вебхуки amoCRM (только роутинг, нулевая логика)
@@ -26,6 +28,10 @@ workflows/entry/          ← входные вебхуки amoCRM (только
 docs/business-tasks/BT-NNN/workflow.json   ← бизнес-логика
     ↓ Execute Workflow (если нужно)
 workflows/utils/          ← переиспользуемые блоки
+
+services/web/             ← микросервис: веб-страницы (выбор мессенджера, лендинги)
+    routes/               ← роуты (каждая BT-задача типа service/both — отдельный файл)
+    templates/            ← EJS-шаблоны страниц
 ```
 
 ## Правило конфига
@@ -33,18 +39,31 @@ workflows/utils/          ← переиспользуемые блоки
 Использовать только реальные ID из этих файлов.
 Никогда не писать ID из головы.
 
+## Типы BT-задач
+
+Каждая BT-задача имеет тип, указанный в spec.md:
+- **n8n** — только воркфлоу в N8N (стандартная автоматизация)
+- **service** — только роут в services/web/ (веб-страница, лендинг)
+- **both** — и воркфлоу N8N, и роут в сервисе (например: страница выбора мессенджера + N8N-связка для склейки контакта)
+
 ## Правила при создании новой BT-задачи
 1. Определить следующий номер — последний BT-NNN в docs/business-tasks/ + 1
 2. Создать папку docs/business-tasks/BT-NNN-название/
-3. Создать spec.md по шаблону из docs/business-tasks/_template/
-4. Создать workflow.json на основе spec.md, используя реальные ID из amocrm-config/
-5. Задеплоить: `node scripts/deploy.js docs/business-tasks/BT-NNN-название` (создаст, назначит тег, активирует, запишет ID в spec.md, синхронизирует workflow.json)
-6. Обновить entry-роутер — добавить ветку на новую BT
-7. Задеплоить роутер: `node scripts/deploy.js workflows/entry/webhook-{event}.json`
-8. Создать log.md с записью v1.0.0
-9. Создать howto.md
-10. Дописать в корневой CHANGELOG.md
-11. Обновить docs/automations.md
+3. Создать spec.md по шаблону из docs/business-tasks/_template/ (указать тип: n8n / service / both)
+4. **Если тип n8n или both:**
+   - Создать workflow.json на основе spec.md, используя реальные ID из amocrm-config/
+   - Задеплоить: `node scripts/deploy.js docs/business-tasks/BT-NNN-название`
+   - Обновить entry-роутер — добавить ветку на новую BT
+   - Задеплоить роутер: `node scripts/deploy.js workflows/entry/webhook-{event}.json`
+5. **Если тип service или both:**
+   - Создать роут в services/web/routes/ (файл: bt-nnn-название.js)
+   - Создать шаблон(ы) в services/web/templates/
+   - Зарегистрировать роут в services/web/routes/index.js
+   - Пересобрать и задеплоить контейнер
+6. Создать log.md с записью v1.0.0
+7. Создать howto.md
+8. Дописать в корневой CHANGELOG.md
+9. Обновить docs/automations.md
 
 ## Документация проекта
 При создании, обновлении или удалении BT-задачи — обязательно обновить `docs/automations.md`.
@@ -104,13 +123,22 @@ $execution.customData.set("branch", "qualified");
 - amoCRM удаляет вебхуки после серии ошибок — при отладке проверять наличие
 
 ## Деплой
-Для деплоя использовать скрипт `scripts/deploy.js`:
+
+### N8N воркфлоу
 ```bash
 node scripts/deploy.js docs/business-tasks/BT-NNN-название   # BT-задача
 node scripts/deploy.js workflows/entry/webhook-deal.json      # entry-роутер
 node scripts/deploy.js workflows/utils/error-handler.json     # утилита
 ```
 Скрипт автоматически: создаёт или обновляет, назначает тег, активирует, синхронизирует workflow.json.
+
+### Веб-сервис
+```bash
+cd services/web
+docker compose up -d --build   # первый запуск или после изменений
+docker compose logs -f          # логи
+```
+Сервис деплоится как Docker-контейнер на поддомен клиента.
 
 ## Версионирование SemVer
 - PATCH (1.0.X) — правка текста, мелкие исправления
@@ -125,6 +153,13 @@ node scripts/deploy.js workflows/utils/error-handler.json     # утилита
 
 ## Файлы задачи
 - spec.md — пишет и правит только человек
-- workflow.json — генерирует и обновляет только Claude
+- workflow.json — генерирует и обновляет только Claude (тип n8n / both)
 - log.md — ведёт только Claude
 - howto.md — описание на человеческом языке: что делает, как работает, как тестировать. Ведёт Claude, обновляет при каждом изменении задачи
+
+## Веб-сервис (services/web/)
+- Один Fastify-сервер, один Docker-контейнер на клиента
+- Каждая BT-задача типа service/both — отдельный файл роута в routes/
+- Шаблоны страниц — EJS в templates/
+- Роут регистрируется в routes/index.js
+- Конфиг сервиса — services/web/.env (не коммитить)
