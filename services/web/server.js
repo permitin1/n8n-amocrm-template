@@ -11,7 +11,7 @@ app.register(view, {
 });
 
 // Health check
-app.get("/health", async () => ({ status: "ok" }));
+app.get("/health", async () => ({ status: "ok", version: "1.0.0" }));
 
 // Routes
 const routes = require("./routes");
