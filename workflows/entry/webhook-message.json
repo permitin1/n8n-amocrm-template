@@ -1,7 +1,82 @@
 {
-  "name": "PROJECT | [ENTRY] Umessage Events",
-  "nodes": [],
-  "connections": {},
-  "settings": {},
-  "active": false
+  "name": "VSC | [ENTRY] Message Events",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vsc-message-events",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e1a00001-0001-4000-8000-000000000001",
+      "name": "Webhook",
+      "webhookId": "vsc-message-events"
+    },
+    {
+      "parameters": {
+        "jsCode": "$execution.customData.set(\"project\", \"VSC\");\n$execution.customData.set(\"bt\", \"ENTRY-MESSAGE\");\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "e1a00001-0002-4000-8000-000000000002",
+      "name": "Custom Data",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $env.BT001_WORKFLOW_ID }}"
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        440,
+        0
+      ],
+      "id": "e1a00001-0003-4000-8000-000000000003",
+      "name": "BT-001 Выбор мессенджера"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Custom Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Custom Data": {
+      "main": [
+        [
+          {
+            "node": "BT-001 Выбор мессенджера",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "errorWorkflow": "{{ N8N_ERROR_WORKFLOW_ID }}",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "active": true
 }

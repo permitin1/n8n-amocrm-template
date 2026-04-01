@@ -2,5 +2,5 @@
 // Each module exports a Fastify plugin: (app, opts, done) => { ... done() }
 
 module.exports = [
-  // require('./messenger-chooser'),
+  require('./bt-001-messenger-chooser'),
 ];

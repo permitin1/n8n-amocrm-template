@@ -1,0 +1,26 @@
+name: Deploy Web Service
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/web/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/vsc-web
+            git pull origin main
+            cd services/web
+            docker compose up -d --build --force-recreate
+            docker image prune -f

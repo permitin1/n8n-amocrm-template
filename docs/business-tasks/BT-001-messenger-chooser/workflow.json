@@ -1,0 +1,1696 @@
+{
+  "name": "VSC | [BT-001] Выбор мессенджера",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000001",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "set-msg",
+              "name": "message_text",
+              "value": "={{ $json.body[\"message[add][0][text]\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "set-unsort",
+              "name": "unsort_id",
+              "value": "={{ $json.body[\"message[add][0][entity_id]\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000002",
+      "name": "Set Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "$execution.customData.set(\"project\", \"VSC\");\n$execution.customData.set(\"bt\", \"BT-001\");\nreturn items;"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000003",
+      "name": "Custom Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-tel",
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "tel",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000004",
+      "name": "If: contains tel?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-cid",
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "cid",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000005",
+      "name": "If: contains cid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        880,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $('Set Fields').item.json.message_text || \"\";\nconst match = text.match(/(tg|max)cid(\\d+)/);\nconst source_type = match ? match[1] : null;\nconst contact_id = match ? match[2] : null;\nreturn [{ json: { ...items[0].json, contact_id, source_type, unsort_id: $('Set Fields').item.json.unsort_id } }];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000006",
+      "name": "Парс CID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://integratorvsc.amocrm.ru/api/v4/leads/unsorted",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000007",
+      "name": "Получить неразобранные (CID)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        -200
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json;\nconst unsortedList = data._embedded?.unsorted || [];\nconst result = unsortedList.map(item => ({\n  json: {\n    unsorted_uid: item.uid,\n    lead_id: item._embedded?.leads?.[0]?.id || null,\n    contact_id: item._embedded?.contacts?.[0]?.id || null\n  }\n}));\nreturn result;"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000008",
+      "name": "Парс unsorted (CID)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "sw-cid",
+                    "leftValue": "={{ $json.lead_id }}",
+                    "rightValue": "={{ $('Set Fields').item.json.unsort_id }}",
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "matched"
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": false
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000009",
+      "name": "Switch (CID)",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1760,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://integratorvsc.amocrm.ru/api/v4/contacts/{{ $('Парс CID').item.json.contact_id }}?with=leads",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000010",
+      "name": "Получить контакт",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1980,
+        -200
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const contact = $json;\nconst leads = contact._embedded?.leads || [];\nif (leads.length === 0) return [];\nconst leadIds = leads.map(l => l.id);\nreturn [{ json: { lead_ids: leadIds, contact_id: $('Парс CID').item.json.contact_id, source_type: $('Парс CID').item.json.source_type } }];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000011",
+      "name": "Найти последнюю сделку (CID)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2200,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const leadIds = $json.lead_ids || [];\nif (leadIds.length === 0) return [{ json: { url: \"\" } }];\nconst filter = leadIds.map(id => `filter[id][]=${id}`).join('&');\nreturn [{ json: { url: `https://integratorvsc.amocrm.ru/api/v4/leads?${filter}` } }];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000012",
+      "name": "URL сделок (CID)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2420,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.url }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000013",
+      "name": "Получить сделки (CID)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2640,
+        -200
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const deals = $json._embedded?.leads || [];\nif (deals.length === 0) return [];\ndeals.sort((a, b) => b.created_at - a.created_at);\nreturn [{ json: deals[0] }];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000014",
+      "name": "Последняя сделка (CID)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2860,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://integratorvsc.amocrm.ru/api/v4/leads/unsorted/{{ $('Switch (CID)').item.json.unsorted_uid }}/link",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"link\": {\n    \"entity_id\": {{ $json.id }},\n    \"entity_type\": \"leads\",\n    \"metadata\": {\n      \"contact_id\": {{ $('Парс CID').item.json.contact_id }}\n    }\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000015",
+      "name": "Привязка неразобранного (CID)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3080,
+        -200
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://integratorvsc.amocrm.ru/api/v4/tasks",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\n  \"task_type_id\": 2409982,\n  \"text\": \"Клиент открыл чат в боте ({{ $('Парс CID').item.json.source_type === 'max' ? 'MAX' : 'TG' }})\",\n  \"complete_till\": {{ Math.floor(Date.now() / 1000) + 86400 }},\n  \"entity_id\": {{ $('Последняя сделка (CID)').item.json.id }},\n  \"entity_type\": \"leads\",\n  \"responsible_user_id\": {{ $('Последняя сделка (CID)').item.json.responsible_user_id }}\n}]",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000016",
+      "name": "Создать задачу (CID)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3300,
+        -200
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://integratorvsc.amocrm.ru/api/v4/contacts/{{ $('Парс CID').item.json.contact_id }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ custom_fields_values: [{ field_id: $('Парс CID').item.json.source_type === 'max' ? 823643 : 822687, values: [{ value: true }] }] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000017",
+      "name": "Чекбокс на контакте (CID)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3520,
+        -200
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $('Set Fields').item.json.message_text || \"\";\nconst telMatch = text.match(/tel(\\d+)/);\nconst tel = telMatch ? telMatch[1] : null;\nif (!tel) return [{ json: { tel: null, source_type: null, utm_source: null, utm_medium: null, utm_campaign: null, utm_term: null, utm_content: null, unsort_id: $('Set Fields').item.json.unsort_id } }];\nconst afterTel = text.substring(text.indexOf('tel' + tel) + ('tel' + tel).length);\nlet separator, source_type;\nif (afterTel.startsWith('-')) { separator = '-'; source_type = 'tg'; }\nelse if (afterTel.startsWith('_')) { separator = '_'; source_type = 'max'; }\nelse return [{ json: { tel, source_type: 'unknown', utm_source: null, utm_medium: null, utm_campaign: null, utm_term: null, utm_content: null, unsort_id: $('Set Fields').item.json.unsort_id } }];\nconst parts = afterTel.substring(1).split(separator);\nreturn [{ json: { tel, source_type, utm_source: parts[0] || null, utm_medium: parts[1] || null, utm_campaign: parts[2] || null, utm_term: parts[3] || null, utm_content: parts[4] || null, unsort_id: $('Set Fields').item.json.unsort_id } }];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000018",
+      "name": "Парс deeplink",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://integratorvsc.amocrm.ru/api/v4/leads/unsorted",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000019",
+      "name": "Получить неразобранные (TEL)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        200
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json;\nconst unsortedList = data._embedded?.unsorted || [];\nconst result = unsortedList.map(item => ({\n  json: {\n    unsorted_uid: item.uid,\n    lead_id: item._embedded?.leads?.[0]?.id || null,\n    contact_id: item._embedded?.contacts?.[0]?.id || null\n  }\n}));\nreturn result;"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000020",
+      "name": "Парс unsorted (TEL)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "sw-tel",
+                    "leftValue": "={{ $json.lead_id }}",
+                    "rightValue": "={{ $('Парс deeplink').item.json.unsort_id }}",
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "matched"
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": false
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000021",
+      "name": "Switch (TEL)",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "set-uid",
+              "name": "uid",
+              "value": "={{ $json.unsorted_uid }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000022",
+      "name": "Извлечь UID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1760,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://integratorvsc.amocrm.ru/api/v4/contacts?query={{ $('Парс deeplink').item.json.tel }}&with=leads",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000023",
+      "name": "Поиск контакта",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1980,
+        200
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-contact-found",
+              "leftValue": "={{ JSON.stringify($json) }}",
+              "rightValue": "contacts",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000024",
+      "name": "Контакт найден?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const contacts = $json._embedded?.contacts || [];\nif (contacts.length === 0) return [];\ncontacts.sort((a, b) => a.created_at - b.created_at);\nconst primary = contacts[0];\nconst leadIds = (primary._embedded?.leads || []).map(l => l.id).filter(Boolean);\nreturn [{ json: { contact_id: primary.id, lead_ids: leadIds } }];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000025",
+      "name": "Парс контакта",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2420,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-visit",
+              "leftValue": "={{ $json.lead_ids.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000026",
+      "name": "Посещение сегодня?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2640,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const leadIds = $('Парс контакта').item.json.lead_ids;\nif (leadIds.length === 0) return [{ json: { url: \"\" } }];\nconst filter = leadIds.map(id => `filter[id][]=${id}`).join('&');\nreturn [{ json: { url: `https://integratorvsc.amocrm.ru/api/v4/leads?${filter}` } }];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000027",
+      "name": "URL сделок (TEL)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.url }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000028",
+      "name": "Получить сделки (TEL)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3080,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const deals = $json._embedded?.leads || [];\nif (deals.length === 0) return [];\ndeals.sort((a, b) => b.created_at - a.created_at);\nreturn [{ json: deals[0] }];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000029",
+      "name": "Последняя сделка (TEL)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://integratorvsc.amocrm.ru/api/v4/leads/unsorted/{{ $('Извлечь UID').item.json.uid }}/link",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"link\": {\n    \"entity_id\": {{ $json.id }},\n    \"entity_type\": \"leads\",\n    \"metadata\": {\n      \"contact_id\": {{ $('Парс контакта').item.json.contact_id }}\n    }\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000030",
+      "name": "Привязка неразобранного (TEL-existing)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3520,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://integratorvsc.amocrm.ru/api/v4/tasks",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\n  \"task_type_id\": 2409982,\n  \"text\": \"Клиент открыл чат в боте ({{ $('Парс deeplink').item.json.source_type === 'max' ? 'MAX' : 'TG' }})\",\n  \"complete_till\": {{ Math.floor(Date.now() / 1000) + 86400 }},\n  \"entity_id\": {{ $('Последняя сделка (TEL)').item.json.id }},\n  \"entity_type\": \"leads\",\n  \"responsible_user_id\": {{ $('Последняя сделка (TEL)').item.json.responsible_user_id }}\n}]",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000031",
+      "name": "Создать задачу (TEL-existing)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3740,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://integratorvsc.amocrm.ru/api/v4/contacts/{{ $('Парс контакта').item.json.contact_id }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ custom_fields_values: [{ field_id: $('Парс deeplink').item.json.source_type === 'max' ? 823643 : 822687, values: [{ value: true }] }] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000032",
+      "name": "Чекбокс на контакте (TEL-existing)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3960,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://integratorvsc.amocrm.ru/api/v4/leads",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\n  \"name\": \"Заявка из бота\",\n  \"_embedded\": {\n    \"contacts\": [{ \"id\": {{ $('Парс контакта').item.json.contact_id }} }]\n  }\n}]",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000033",
+      "name": "Создать сделку (TEL-new-deal)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2860,
+        250
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const leads = $json._embedded?.leads || [];\nreturn [{ json: { lead_id: leads[0]?.id || null, contact_id: $('Парс контакта').item.json.contact_id } }];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000034",
+      "name": "Парс новой сделки",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3080,
+        250
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://integratorvsc.amocrm.ru/api/v4/leads/unsorted/{{ $('Извлечь UID').item.json.uid }}/link",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"link\": {\n    \"entity_id\": {{ $json.lead_id }},\n    \"entity_type\": \"leads\",\n    \"metadata\": {\n      \"contact_id\": {{ $('Парс контакта').item.json.contact_id }}\n    }\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000035",
+      "name": "Привязка неразобранного (TEL-new-deal)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3300,
+        250
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "amount": 5,
+        "unit": "seconds"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000036",
+      "name": "Ждём 5 сек",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3520,
+        250
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://integratorvsc.amocrm.ru/api/v4/leads/{{ $('Парс новой сделки').item.json.lead_id }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ custom_fields_values: [ { field_id: 358897, values: [{ value: $('Парс deeplink').item.json.utm_source || '' }] }, { field_id: 358899, values: [{ value: $('Парс deeplink').item.json.utm_medium || '' }] }, { field_id: 358901, values: [{ value: $('Парс deeplink').item.json.utm_campaign || '' }] }, { field_id: 358903, values: [{ value: $('Парс deeplink').item.json.utm_term || '' }] }, { field_id: 358905, values: [{ value: $('Парс deeplink').item.json.utm_content || '' }] } ] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000037",
+      "name": "UTM на сделке",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3740,
+        250
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://integratorvsc.amocrm.ru/api/v4/contacts/{{ $('Парс контакта').item.json.contact_id }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ custom_fields_values: [{ field_id: $('Парс deeplink').item.json.source_type === 'max' ? 823643 : 822687, values: [{ value: true }] }] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000038",
+      "name": "Чекбокс на контакте (TEL-new-deal)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3960,
+        250
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://integratorvsc.amocrm.ru/api/v4/tasks",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\n  \"task_type_id\": 2409982,\n  \"text\": \"Клиент открыл чат в боте ({{ $('Парс deeplink').item.json.source_type === 'max' ? 'MAX' : 'TG' }})\",\n  \"complete_till\": {{ Math.floor(Date.now() / 1000) + 86400 }},\n  \"entity_id\": {{ $('Парс новой сделки').item.json.lead_id }},\n  \"entity_type\": \"leads\",\n  \"responsible_user_id\": {{ $json.responsible_user_id }}\n}]",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000039",
+      "name": "Задача (TEL-new-deal)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4180,
+        250
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const dp = $('Парс deeplink').item.json;\nconst sw = $('Switch (TEL)').item.json;\nreturn [{ json: {\n  contact_id: sw.contact_id,\n  lead_id: sw.lead_id,\n  tel: dp.tel,\n  source_type: dp.source_type,\n  utm_source: dp.utm_source, utm_medium: dp.utm_medium,\n  utm_campaign: dp.utm_campaign, utm_term: dp.utm_term, utm_content: dp.utm_content\n}}];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000040",
+      "name": "Подготовка данных (новый)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2420,
+        450
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://integratorvsc.amocrm.ru/api/v4/contacts/{{ $json.contact_id }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_fields_values\": [{\n    \"field_code\": \"PHONE\",\n    \"values\": [{ \"value\": \"{{ $json.tel }}\", \"enum_code\": \"MOB\" }]\n  }]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000041",
+      "name": "Обновить телефон контакта",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2640,
+        450
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://integratorvsc.amocrm.ru/api/v4/leads/{{ $('Подготовка данных (новый)').item.json.lead_id }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ custom_fields_values: [ { field_id: 358897, values: [{ value: $('Подготовка данных (новый)').item.json.utm_source || '' }] }, { field_id: 358899, values: [{ value: $('Подготовка данных (новый)').item.json.utm_medium || '' }] }, { field_id: 358901, values: [{ value: $('Подготовка данных (новый)').item.json.utm_campaign || '' }] }, { field_id: 358903, values: [{ value: $('Подготовка данных (новый)').item.json.utm_term || '' }] }, { field_id: 358905, values: [{ value: $('Подготовка данных (новый)').item.json.utm_content || '' }] } ] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000042",
+      "name": "UTM + чекбокс (новый)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2860,
+        450
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://integratorvsc.amocrm.ru/api/v4/contacts/{{ $('Подготовка данных (новый)').item.json.contact_id }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ custom_fields_values: [{ field_id: $('Подготовка данных (новый)').item.json.source_type === 'max' ? 823643 : 822687, values: [{ value: true }] }] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000043",
+      "name": "Чекбокс на контакте (новый)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3080,
+        450
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://integratorvsc.amocrm.ru/api/v4/tasks",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.AMOCRM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\n  \"task_type_id\": 2409982,\n  \"text\": \"Клиент открыл чат в боте ({{ $('Подготовка данных (новый)').item.json.source_type === 'max' ? 'MAX' : 'TG' }})\",\n  \"complete_till\": {{ Math.floor(Date.now() / 1000) + 86400 }},\n  \"entity_id\": {{ $('Подготовка данных (новый)').item.json.lead_id }},\n  \"entity_type\": \"leads\"\n}]",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-b111-000000000044",
+      "name": "Задача (новый)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3300,
+        450
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Fields": {
+      "main": [
+        [
+          {
+            "node": "Custom Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Custom Data": {
+      "main": [
+        [
+          {
+            "node": "If: contains tel?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If: contains tel?": {
+      "main": [
+        [
+          {
+            "node": "Парс deeplink",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If: contains cid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If: contains cid?": {
+      "main": [
+        [
+          {
+            "node": "Парс CID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Парс CID": {
+      "main": [
+        [
+          {
+            "node": "Получить неразобранные (CID)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получить неразобранные (CID)": {
+      "main": [
+        [
+          {
+            "node": "Парс unsorted (CID)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парс unsorted (CID)": {
+      "main": [
+        [
+          {
+            "node": "Switch (CID)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch (CID)": {
+      "main": [
+        [
+          {
+            "node": "Получить контакт",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получить контакт": {
+      "main": [
+        [
+          {
+            "node": "Найти последнюю сделку (CID)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Найти последнюю сделку (CID)": {
+      "main": [
+        [
+          {
+            "node": "URL сделок (CID)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "URL сделок (CID)": {
+      "main": [
+        [
+          {
+            "node": "Получить сделки (CID)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получить сделки (CID)": {
+      "main": [
+        [
+          {
+            "node": "Последняя сделка (CID)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Последняя сделка (CID)": {
+      "main": [
+        [
+          {
+            "node": "Привязка неразобранного (CID)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Привязка неразобранного (CID)": {
+      "main": [
+        [
+          {
+            "node": "Создать задачу (CID)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Создать задачу (CID)": {
+      "main": [
+        [
+          {
+            "node": "Чекбокс на контакте (CID)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парс deeplink": {
+      "main": [
+        [
+          {
+            "node": "Получить неразобранные (TEL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получить неразобранные (TEL)": {
+      "main": [
+        [
+          {
+            "node": "Парс unsorted (TEL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парс unsorted (TEL)": {
+      "main": [
+        [
+          {
+            "node": "Switch (TEL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch (TEL)": {
+      "main": [
+        [
+          {
+            "node": "Извлечь UID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Извлечь UID": {
+      "main": [
+        [
+          {
+            "node": "Поиск контакта",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Поиск контакта": {
+      "main": [
+        [
+          {
+            "node": "Контакт найден?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Контакт найден?": {
+      "main": [
+        [
+          {
+            "node": "Парс контакта",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Подготовка данных (новый)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парс контакта": {
+      "main": [
+        [
+          {
+            "node": "Посещение сегодня?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Посещение сегодня?": {
+      "main": [
+        [
+          {
+            "node": "URL сделок (TEL)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Создать сделку (TEL-new-deal)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "URL сделок (TEL)": {
+      "main": [
+        [
+          {
+            "node": "Получить сделки (TEL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получить сделки (TEL)": {
+      "main": [
+        [
+          {
+            "node": "Последняя сделка (TEL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Последняя сделка (TEL)": {
+      "main": [
+        [
+          {
+            "node": "Привязка неразобранного (TEL-existing)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Привязка неразобранного (TEL-existing)": {
+      "main": [
+        [
+          {
+            "node": "Создать задачу (TEL-existing)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Создать задачу (TEL-existing)": {
+      "main": [
+        [
+          {
+            "node": "Чекбокс на контакте (TEL-existing)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Создать сделку (TEL-new-deal)": {
+      "main": [
+        [
+          {
+            "node": "Парс новой сделки",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парс новой сделки": {
+      "main": [
+        [
+          {
+            "node": "Привязка неразобранного (TEL-new-deal)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Привязка неразобранного (TEL-new-deal)": {
+      "main": [
+        [
+          {
+            "node": "Ждём 5 сек",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ждём 5 сек": {
+      "main": [
+        [
+          {
+            "node": "UTM на сделке",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UTM на сделке": {
+      "main": [
+        [
+          {
+            "node": "Чекбокс на контакте (TEL-new-deal)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Чекбокс на контакте (TEL-new-deal)": {
+      "main": [
+        [
+          {
+            "node": "Задача (TEL-new-deal)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовка данных (новый)": {
+      "main": [
+        [
+          {
+            "node": "Обновить телефон контакта",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Обновить телефон контакта": {
+      "main": [
+        [
+          {
+            "node": "UTM + чекбокс (новый)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UTM + чекбокс (новый)": {
+      "main": [
+        [
+          {
+            "node": "Чекбокс на контакте (новый)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Чекбокс на контакте (новый)": {
+      "main": [
+        [
+          {
+            "node": "Задача (новый)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "errorWorkflow": "{{ N8N_ERROR_WORKFLOW_ID }}",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "active": true
+}

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Страховка Ипотеки — Консультация</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-start: #1a1215;
+      --bg-end: #2a1a1e;
+      --surface: rgba(255,255,255,0.06);
+      --surface-hover: rgba(255,255,255,0.1);
+      --border: rgba(255,255,255,0.08);
+      --text: #f5ebe4;
+      --text-muted: rgba(245,235,228,0.5);
+      --accent-warm: #e8a87c;
+      --tg: #2AABEE;
+      --tg-glow: rgba(42,171,238,0.25);
+      --max: #7B5CFA;
+      --max-glow: rgba(123,92,250,0.25);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-start);
+      background-image:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,168,124,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 20% 100%, rgba(42,171,238,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 50% at 80% 100%, rgba(0,119,255,0.06) 0%, transparent 50%);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+    }
+    .container {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 480px; text-align: center;
+    }
+
+    .shield {
+      width: 48px; height: 48px; margin: 0 auto 20px;
+      opacity: 0; animation: fadeUp 0.6s ease forwards;
+    }
+    .shield svg { width: 100%; height: 100%; }
+
+    h1 {
+      font-size: 26px; font-weight: 700; line-height: 1.25;
+      letter-spacing: -0.5px; margin-bottom: 10px;
+      opacity: 0; animation: fadeUp 0.6s ease 0.1s forwards;
+    }
+    h1 span { color: var(--accent-warm); }
+    .subtitle {
+      font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px; font-weight: 400;
+      opacity: 0; animation: fadeUp 0.6s ease 0.15s forwards;
+    }
+    .trust {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--accent-warm); font-weight: 500;
+      margin-bottom: 32px;
+      opacity: 0; animation: fadeUp 0.6s ease 0.2s forwards;
+    }
+    .trust svg { width: 14px; height: 14px; }
+
+    .label {
+      font-size: 13px; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 2px; color: var(--text-muted); margin-bottom: 14px;
+      opacity: 0; animation: fadeUp 0.6s ease 0.3s forwards;
+    }
+
+    /* Phone input */
+    .phone-wrap {
+      margin-bottom: 28px;
+      opacity: 0; animation: fadeUp 0.6s ease 0.35s forwards;
+    }
+    .phone-input {
+      width: 100%; padding: 18px 24px;
+      font-size: 22px; font-weight: 600; font-family: 'Outfit', sans-serif;
+      letter-spacing: 1.5px;
+      border: 1px solid var(--border); border-radius: 16px;
+      background: var(--surface); color: var(--text);
+      text-align: center; outline: none;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+    }
+    .phone-input:focus {
+      border-color: var(--accent-warm);
+      box-shadow: 0 0 0 3px rgba(232,168,124,0.15);
+    }
+    .phone-input::placeholder { color: var(--text-muted); font-size: 16px; letter-spacing: 0; font-weight: 400; }
+
+    /* Buttons — mobile */
+    .buttons-wrap {
+      display: flex; flex-direction: column; gap: 12px;
+      opacity: 0; animation: fadeUp 0.6s ease 0.4s forwards;
+    }
+    .messenger-btn {
+      display: flex; align-items: center; gap: 14px;
+      width: 100%; padding: 18px 24px;
+      border-radius: 16px; border: 1px solid var(--border);
+      background: var(--surface);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      font-size: 16px; font-weight: 600; font-family: 'Outfit', sans-serif;
+      color: var(--text); text-decoration: none; cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .messenger-btn:hover:not(.disabled) { background: var(--surface-hover); }
+    .messenger-btn:active:not(.disabled) { transform: scale(0.98); }
+    .messenger-btn.disabled { opacity: 0.3; pointer-events: none; filter: grayscale(0.5); }
+    .messenger-btn .icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .messenger-btn .icon svg { width: 26px; height: 26px; }
+    .btn-tg .icon { background: var(--tg); box-shadow: 0 4px 20px var(--tg-glow); }
+    .btn-max .icon { background: linear-gradient(135deg, #7B5CFA 0%, #4ECDC4 100%); box-shadow: 0 4px 20px var(--max-glow); }
+    .messenger-btn .info { text-align: left; }
+    .messenger-btn .info .name { display: block; font-weight: 600; }
+    .messenger-btn .info .hint { display: block; font-size: 12px; color: var(--text-muted); font-weight: 400; margin-top: 2px; }
+
+    /* "Далее" button — desktop only */
+    .next-btn {
+      display: none; width: 100%; padding: 18px 24px;
+      border-radius: 16px; border: none;
+      background: var(--accent-warm); color: var(--bg-start);
+      font-size: 16px; font-weight: 700; font-family: 'Outfit', sans-serif;
+      cursor: pointer; transition: all 0.25s ease;
+      opacity: 0; animation: fadeUp 0.6s ease 0.4s forwards;
+    }
+    .next-btn:hover:not(:disabled) { opacity: 0.9; transform: scale(1.01); }
+    .next-btn:active:not(:disabled) { transform: scale(0.98); }
+    .next-btn:disabled { opacity: 0.3; cursor: default; }
+    .back-btn {
+      display: none; background: none; border: none; color: var(--text-muted);
+      font-size: 13px; font-family: 'Outfit', sans-serif; cursor: pointer;
+      margin-top: 16px; text-decoration: underline; text-underline-offset: 3px;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--text); }
+
+    /* Desktop: hide mobile buttons, show "Далее" */
+    .qr-section { display: none; }
+    @media (hover: hover) and (pointer: fine) {
+      .buttons-wrap { display: none; }
+      .next-btn { display: block; }
+      .desktop-label-messenger { display: none; }
+      /* Step 2: QR view */
+      .step-phone.hidden { display: none; }
+      .qr-section {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        opacity: 0; animation: fadeUp 0.4s ease forwards;
+      }
+      .qr-section:not(.active) { display: none; }
+      .qr-section.active { display: grid; }
+      .back-btn.active { display: inline-block; }
+      .qr-card {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 20px; padding: 28px 20px 24px;
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        display: flex; flex-direction: column; align-items: center; gap: 16px;
+        transition: all 0.3s ease;
+      }
+      .qr-card:hover { background: var(--surface-hover); transform: translateY(-4px); }
+      .qr-card.tg:hover { box-shadow: 0 8px 40px var(--tg-glow); border-color: rgba(42,171,238,0.2); }
+      .qr-card.max:hover { box-shadow: 0 8px 40px var(--max-glow); border-color: rgba(0,119,255,0.2); }
+      .qr-wrap {
+        position: relative; width: 200px;
+        background: #fff; border-radius: 16px; padding: 14px 14px 48px;
+      }
+      .qr-wrap canvas { width: 100%; height: auto; display: block; border-radius: 6px; }
+      .qr-card-label {
+        position: absolute; bottom: 12px; left: 0; right: 0;
+        font-size: 15px; font-weight: 700; text-align: center;
+      }
+      .qr-card.tg .qr-card-label { color: var(--tg); }
+      .qr-card.max .qr-card-label { color: var(--max); }
+      .qr-logo {
+        position: absolute; top: calc(50% - 24px); left: 50%; transform: translate(-50%, -50%);
+        width: 52px; height: 52px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 0 0 5px #fff;
+      }
+      .qr-logo svg { width: 28px; height: 28px; }
+      .qr-logo.tg { background: var(--tg); }
+      .qr-logo.max { background: #7B5CFA; }
+      .qr-link { font-size: 12px; color: var(--text-muted); }
+      .qr-link a { color: var(--text-muted); text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s; }
+      .qr-card.tg .qr-link a:hover { color: var(--tg); }
+      .qr-card.max .qr-link a:hover { color: var(--max); }
+    }
+
+    .footer {
+      margin-top: 28px; font-size: 12px; color: var(--text-muted); line-height: 1.5;
+      opacity: 0; animation: fadeUp 0.6s ease 0.5s forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="shield">
+      <svg viewBox="0 0 48 48" fill="none"><path d="M24 4L8 12v10c0 11.1 6.8 21.4 16 24 9.2-2.6 16-12.9 16-24V12L24 4z" fill="none" stroke="var(--accent-warm)" stroke-width="2.5" stroke-linejoin="round"/><path d="M18 24l4 4 8-8" stroke="var(--accent-warm)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <h1>Экономия до <span>70%</span> на страховании ипотеки</h1>
+    <p class="subtitle">Законно. Официально. С гарантией. Работаем по всей России.</p>
+    <p class="trust">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M8 1l2.245 4.55 5.022.73-3.633 3.541.858 5.003L8 12.675l-4.492 2.36.858-5.003L.733 6.49l5.022-.73L8 1z" fill="currentColor"/></svg>
+      Более 3 000 семей уже сэкономили
+    </p>
+
+    <!-- Step 1: phone input -->
+    <div id="step-phone" class="step-phone">
+      <p class="label">Ваш номер телефона</p>
+      <div class="phone-wrap">
+        <input class="phone-input" id="phone" type="tel" placeholder="Введите номер" inputmode="tel" autocomplete="tel">
+      </div>
+
+      <!-- Desktop: "Далее" button -->
+      <button class="next-btn" id="next-btn" disabled>Далее</button>
+
+      <p class="label desktop-label-messenger" style="animation-delay:0.38s">Выберите мессенджер</p>
+    </div>
+
+    <!-- Mobile: messenger buttons (always in DOM, hidden on desktop via CSS) -->
+    <div class="buttons-wrap">
+      <a class="messenger-btn btn-tg disabled" id="btn-tg" href="#">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785L21.933 5.054c.311-1.238-.472-1.8-1.268-1.337z" fill="#fff"/></svg>
+        </div>
+        <div class="info">
+          <span class="name">Telegram</span>
+          <span class="hint">Откроется приложение</span>
+        </div>
+      </a>
+      <a class="messenger-btn btn-max disabled" id="btn-max" href="#">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.04.61 3.93 1.66 5.51L2 22l4.49-1.66A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z" fill="#fff"/><circle cx="13.5" cy="11" r="3.5" fill="currentColor"/></svg>
+        </div>
+        <div class="info">
+          <span class="name">MAX</span>
+          <span class="hint">Откроется приложение</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Desktop QR -->
+    <div class="qr-section" id="qr-section">
+      <div class="qr-card tg">
+        <div class="qr-wrap">
+          <canvas id="qr-tg"></canvas>
+          <div class="qr-logo tg">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785L21.933 5.054c.311-1.238-.472-1.8-1.268-1.337z" fill="#fff"/></svg>
+          </div>
+          <span class="qr-card-label">Telegram</span>
+        </div>
+        <span class="qr-link"><a id="link-tg" href="#">Открыть ссылку</a></span>
+      </div>
+      <div class="qr-card max">
+        <div class="qr-wrap">
+          <canvas id="qr-max"></canvas>
+          <div class="qr-logo max">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.04.61 3.93 1.66 5.51L2 22l4.49-1.66A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z" fill="#fff"/><circle cx="13.5" cy="11" r="3.5" fill="currentColor"/></svg>
+          </div>
+          <span class="qr-card-label">MAX</span>
+        </div>
+        <span class="qr-link"><a id="link-max" href="#">Открыть ссылку</a></span>
+      </div>
+    </div>
+    <button class="back-btn" id="back-btn">Изменить номер</button>
+    <p class="footer desktop-qr-hint" style="display:none">Отсканируйте QR-код камерой телефона</p>
+
+    <p class="footer">Бесплатная консультация. Подберём выгодный полис,<br>гарантированно принимаемый вашим банком.</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <script>
+    var TG_BOT = '<%= tgBot %>';
+    var MAX_BOT = '<%= maxBot %>';
+    var utmSource = '<%= typeof utm_source !== "undefined" ? utm_source : "" %>';
+    var utmMedium = '<%= typeof utm_medium !== "undefined" ? utm_medium : "" %>';
+    var utmCampaign = '<%= typeof utm_campaign !== "undefined" ? utm_campaign : "" %>';
+    var utmTerm = '<%= typeof utm_term !== "undefined" ? utm_term : "" %>';
+    var utmContent = '<%= typeof utm_content !== "undefined" ? utm_content : "" %>';
+
+    var phoneInput = document.getElementById('phone');
+    var btnTg = document.getElementById('btn-tg');
+    var btnMax = document.getElementById('btn-max');
+    var qrSection = document.getElementById('qr-section');
+    var nextBtn = document.getElementById('next-btn');
+    var backBtn = document.getElementById('back-btn');
+    var stepPhone = document.getElementById('step-phone');
+    var qrHint = document.querySelector('.desktop-qr-hint');
+    var isDesktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    var currentPhone = '';
+
+    phoneInput.addEventListener('input', function() {
+      var digits = this.value.replace(/\D/g, '');
+      if (digits.length > 0 && digits[0] === '8') digits = '7' + digits.slice(1);
+      if (digits.length > 11) digits = digits.slice(0, 11);
+      if (digits.length === 0) { this.value = ''; currentPhone = ''; updateState(); return; }
+      var f = '+7';
+      if (digits.length > 1) f += ' (' + digits.slice(1, 4);
+      if (digits.length > 4) f += ') ' + digits.slice(4, 7);
+      if (digits.length > 7) f += '-' + digits.slice(7, 9);
+      if (digits.length > 9) f += '-' + digits.slice(9, 11);
+      this.value = f;
+      currentPhone = digits.length === 11 ? digits : '';
+      updateState();
+    });
+
+    phoneInput.addEventListener('focus', function() { if (!this.value) this.value = '+7'; });
+    phoneInput.addEventListener('blur', function() { if (this.value === '+7') this.value = ''; });
+
+    function updateState() {
+      var valid = !!currentPhone;
+      // Mobile: enable/disable buttons
+      btnTg.classList.toggle('disabled', !valid); btnTg.href = valid ? buildUrl('tg') : '#';
+      btnMax.classList.toggle('disabled', !valid); btnMax.href = valid ? buildUrl('max') : '#';
+      // Desktop: enable/disable "Далее"
+      if (nextBtn) nextBtn.disabled = !valid;
+    }
+
+    function buildPayload(phone, sep) {
+      var parts = ['tel' + phone];
+      var utms = [utmSource, utmMedium, utmCampaign, utmTerm, utmContent];
+      var hasAny = utms.some(function(u) { return !!u; });
+      if (hasAny) {
+        for (var i = 0; i < utms.length; i++) parts.push(utms[i] || '');
+        while (parts.length > 1 && parts[parts.length - 1] === '') parts.pop();
+      }
+      return parts.join(sep);
+    }
+
+    function buildUrl(type) {
+      if (!currentPhone) return '#';
+      if (type === 'tg') return 'https://t.me/' + TG_BOT + '?start=' + buildPayload(currentPhone, '-');
+      return 'https://max.ru/' + MAX_BOT + '?start=' + buildPayload(currentPhone, '_');
+    }
+
+    // Desktop: "Далее" → show QR step
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function() {
+        if (!currentPhone) return;
+        var tgUrl = buildUrl('tg');
+        var maxUrl = buildUrl('max');
+
+        stepPhone.classList.add('hidden');
+        qrSection.classList.add('active');
+        backBtn.classList.add('active');
+        if (qrHint) qrHint.style.display = 'block';
+
+        document.getElementById('link-tg').href = tgUrl;
+        document.getElementById('link-max').href = maxUrl;
+        new QRious({ element: document.getElementById('qr-tg'), value: tgUrl, size: 400, level: 'H', foreground: '#2AABEE' });
+        new QRious({ element: document.getElementById('qr-max'), value: maxUrl, size: 400, level: 'H', foreground: '#7B5CFA' });
+      });
+    }
+
+    // Desktop: "Назад" → back to phone step
+    if (backBtn) {
+      backBtn.addEventListener('click', function() {
+        stepPhone.classList.remove('hidden');
+        qrSection.classList.remove('active');
+        backBtn.classList.remove('active');
+        if (qrHint) qrHint.style.display = 'none';
+        phoneInput.focus();
+      });
+    }
+  </script>
+</body>
+</html>
