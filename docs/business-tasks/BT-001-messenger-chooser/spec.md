@@ -5,9 +5,11 @@
 | Параметр | Значение |
 |----------|----------|
 | Тип | both |
-| N8N Workflow ID | — (заполнить после деплоя) |
-| Статус | Разработка |
-| Версия | 1.0.0 |
+| N8N Workflow ID | d76ys6l29jtJKHA6 |
+| Entry Router ID | 6dgh5GLM2V79t91e |
+| Веб-сервис | https://strahovka.ldlg.pro |
+| Статус | Активно |
+| Версия | 1.1.0 |
 
 ## Что делает
 
@@ -28,9 +30,9 @@
 
 | Роут | Параметры | Описание |
 |------|-----------|----------|
-| GET /messenger | contact_id | Страница выбора мессенджера, deeplink с contact_id |
-| GET /messenger | phone, utm_* | Страница выбора мессенджера, deeplink с телефоном + UTM |
-| GET /landing | utm_* (опц.) | Лендинг с полем ввода телефона + выбор мессенджера |
+| GET /m | cid | Страница выбора мессенджера, deeplink с contact_id |
+| GET /m | p, us, um, uc, ut, uo | Страница выбора мессенджера, deeplink с телефоном + UTM |
+| GET /l | us, um, uc, ut, uo (опц.) | Лендинг с полем ввода телефона + выбор мессенджера |
 
 Deeplink форматы:
 - TG: `https://t.me/vsc_strahovka_bot?start=PAYLOAD`

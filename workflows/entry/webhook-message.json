@@ -36,11 +36,11 @@
         "workflowId": {
           "__rl": true,
           "mode": "id",
-          "value": "={{ $env.BT001_WORKFLOW_ID }}"
+          "value": "d76ys6l29jtJKHA6"
         }
       },
       "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
+      "typeVersion": 1.2,
       "position": [
         440,
         0

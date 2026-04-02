@@ -8,27 +8,56 @@
 2. **Редирект с сайта/марквиза** — URL с телефоном и UTM-метками
 3. **Рекламный лендинг** — клиент сам вводит телефон
 
-На странице — две кнопки: Telegram и MAX. На десктопе — QR-коды.
+На мобильном — две кнопки: Telegram и MAX. На десктопе — QR-коды с подписями и ссылками-фолбэками. На лендинге (десктоп) — сначала ввод телефона + кнопка "Далее", затем QR-коды.
 
 При переходе в мессенджер клиент нажимает Start в боте. Бот отправляет deeplink-сообщение, которое попадает в amoCRM как неразобранное. N8N ловит вебхук, парсит deeplink и:
 - Находит или создаёт контакт/сделку
 - Привязывает неразобранное к нужной сделке
 - Ставит чекбокс мессенджера на контакте
-- Создаёт задачу менеджеру
+- Создаёт задачу менеджеру (тип "Вх.сообщение", ID: 2409982)
+
+## Инфраструктура
+
+| Компонент | Адрес / ID |
+|-----------|-----------|
+| Веб-сервис | https://strahovka.ldlg.pro |
+| Сервер | 176.124.213.127 (Timeweb Cloud) |
+| SSH | `ssh -i ~/.ssh/id_permitin root@176.124.213.127` |
+| n8n Entry-роутер | https://nn8n.ldlgdemo.ru/workflow/6dgh5GLM2V79t91e |
+| n8n BT-001 воркфлоу | https://nn8n.ldlgdemo.ru/workflow/d76ys6l29jtJKHA6 |
+| GitHub репо | permitin1/n8n-amocrm-template |
+| CI/CD | Push в main (services/web/**) → автодеплой |
+
+## URL-схема
+
+| Сценарий | URL | Параметры |
+|----------|-----|-----------|
+| По contact_id | `/m?cid=12345` | `cid` — ID контакта в amoCRM |
+| По телефону | `/m?p=79991234567&us=yandex&um=cpc` | `p` — телефон, `us/um/uc/ut/uo` — UTM |
+| Лендинг | `/l?us=yandex&um=cpc` | `us/um/uc/ut/uo` — UTM (опционально) |
+
+Длинные параметры тоже работают: `phone`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`.
+
+## Deeplink формат
+
+| Мессенджер | По contact_id | По телефону + UTM |
+|------------|--------------|-------------------|
+| Telegram (разделитель `-`) | `tgcid12345` | `tel79991234567-yandex-cpc-camp-term-content` |
+| MAX (разделитель `_`) | `maxcid12345` | `tel79991234567_yandex_cpc_camp_term_content` |
 
 ## Как тестировать
 
 ### Предварительно
-1. Убедиться что `.env` заполнен (AMOCRM_ACCESS_TOKEN, AMOCRM_DOMAIN)
-2. Задеплоить воркфлоу: `node scripts/deploy.js docs/business-tasks/BT-001-messenger-chooser`
-3. Задеплоить entry-роутер: `node scripts/deploy.js workflows/entry/webhook-message.json`
-4. Настроить вебхук в amoCRM: message events → URL entry-роутера
-5. Запустить веб-сервис: `cd services/web && docker compose up -d --build`
+
+Всё уже задеплоено:
+- Воркфлоу BT-001 и entry-роутер активны в n8n
+- Вебхук amoCRM на `add_message` → `https://nn8n.ldlgdemo.ru/webhook/vsc-message-events`
+- Веб-сервис на https://strahovka.ldlg.pro
 
 ### Сценарий 1: contact_id
 
 1. Взять реальный contact_id из amoCRM (с открытой сделкой)
-2. Открыть: `{BASE_URL}/messenger?contact_id={ID}`
+2. Открыть: `https://strahovka.ldlg.pro/m?cid={ID}`
 3. На мобильном — нажать кнопку TG или MAX
 4. В боте нажать Start
 5. Проверить в amoCRM:
@@ -38,7 +67,7 @@
 
 ### Сценарий 2: phone + UTM
 
-1. Открыть: `{BASE_URL}/messenger?phone=79991234567&utm_source=test&utm_medium=cpc`
+1. Открыть: `https://strahovka.ldlg.pro/m?p=79991234567&us=test&um=cpc`
 2. Нажать кнопку мессенджера → Start в боте
 3. Проверить в amoCRM:
    - Контакт найден по телефону
@@ -49,13 +78,30 @@
 
 ### Сценарий 3: лендинг
 
-1. Открыть: `{BASE_URL}/landing?utm_source=yandex&utm_medium=cpc`
-2. Ввести номер телефона → кнопки активируются
-3. Нажать мессенджер → Start
-4. Проверить аналогично сценарию 2
+1. Открыть: `https://strahovka.ldlg.pro/l?us=yandex&um=cpc`
+2. Ввести номер телефона
+3. **Мобильный:** кнопки мессенджеров активируются → нажать → Start
+4. **Десктоп:** нажать "Далее" → появятся QR-коды → сканировать или кликнуть ссылку
+5. Проверить аналогично сценарию 2
 
 ### Десктоп QR
 
 1. Открыть любую страницу в десктоп-браузере
-2. QR-коды должны отображаться в цветах мессенджеров
-3. Сканировать QR камерой телефона → должен открыться бот
+2. QR-коды отображаются в цветах мессенджеров (голубой TG, фиолетовый MAX) с логотипами
+3. Сканировать QR камерой телефона → должен открыться бот с deeplink
+
+## Деплой
+
+### Автоматический (CI/CD)
+Любой push в `main` затрагивающий `services/web/**` → GitHub Actions → SSH на сервер → `git pull && docker compose up -d --build`.
+
+### Ручной
+```bash
+# Веб-сервис
+ssh -i ~/.ssh/id_permitin root@176.124.213.127
+cd /opt/vsc-web && git pull origin main
+cd services/web && docker compose up -d --build
+
+# n8n воркфлоу
+node scripts/deploy.js docs/business-tasks/BT-001-messenger-chooser
+```
