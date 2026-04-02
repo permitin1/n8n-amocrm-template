@@ -58,6 +58,20 @@
       opacity: 0; animation: fadeIn 0.5s ease 0.15s forwards;
     }
 
+    /* Author */
+    .author {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 14px 18px; margin-bottom: 24px; box-shadow: var(--shadow);
+      text-align: left;
+      opacity: 0; animation: fadeIn 0.5s ease 0.18s forwards;
+    }
+    .author-photo {
+      width: 52px; height: 52px; border-radius: 50%; object-fit: cover; object-position: 70% 10%; flex-shrink: 0;
+    }
+    .author-info { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+    .author-name { font-size: 14px; font-weight: 600; color: var(--text); display: block; margin-bottom: 2px; }
+
     /* Mobile buttons */
     .buttons-wrap {
       display: flex; flex-direction: column; gap: 12px;
@@ -150,6 +164,14 @@
 
     <h1>Экономия до 70%<br>на страховании ипотеки</h1>
     <p class="subtitle">Подберём выгодный полис, принимаемый вашим банком</p>
+    <div class="author">
+      <img class="author-photo" src="/public/img/author.png" alt="Дарья Швецова">
+      <div class="author-info">
+        <span class="author-name">Дарья Швецова</span>
+        Эксперт по ипотечному страхованию
+      </div>
+    </div>
+
     <p class="label">Выберите мессенджер</p>
 
     <!-- Mobile -->

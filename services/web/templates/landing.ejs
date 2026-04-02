@@ -65,6 +65,20 @@
       opacity: 0; animation: fadeIn 0.5s ease 0.15s forwards;
     }
 
+    /* Author */
+    .author {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 14px 18px; margin-bottom: 24px; box-shadow: var(--shadow);
+      text-align: left;
+      opacity: 0; animation: fadeIn 0.5s ease 0.14s forwards;
+    }
+    .author-photo {
+      width: 52px; height: 52px; border-radius: 50%; object-fit: cover; object-position: 70% 10%; flex-shrink: 0;
+    }
+    .author-info { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+    .author-name { font-size: 14px; font-weight: 600; color: var(--text); display: block; margin-bottom: 2px; }
+
     /* Phone */
     .phone-wrap {
       margin-bottom: 20px;
@@ -203,6 +217,14 @@
       <svg viewBox="0 0 16 16" fill="none"><path d="M8 1l2.245 4.55 5.022.73-3.633 3.541.858 5.003L8 12.675l-4.492 2.36.858-5.003L.733 6.49l5.022-.73L8 1z" fill="currentColor"/></svg>
       Более 3 000 семей уже сэкономили
     </p>
+
+    <div class="author">
+      <img class="author-photo" src="/public/img/author.png" alt="Дарья Швецова">
+      <div class="author-info">
+        <span class="author-name">Дарья Швецова</span>
+        Эксперт по ипотечному страхованию
+      </div>
+    </div>
 
     <div id="step-phone" class="step-phone">
       <p class="label">Ваш номер телефона</p>

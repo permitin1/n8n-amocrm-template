@@ -1,6 +1,7 @@
 const Fastify = require("fastify");
 const path = require("path");
 const view = require("@fastify/view");
+const fastifyStatic = require("@fastify/static");
 const ejs = require("ejs");
 
 const app = Fastify({ logger: true });
@@ -8,6 +9,11 @@ const app = Fastify({ logger: true });
 app.register(view, {
   engine: { ejs },
   root: path.join(__dirname, "templates"),
+});
+
+app.register(fastifyStatic, {
+  root: path.join(__dirname, "public"),
+  prefix: "/public/",
 });
 
 // Health check
