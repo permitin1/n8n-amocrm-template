@@ -2,10 +2,16 @@ const TG_BOT = 'vsc_strahovka_bot';
 const MAX_BOT = 'id525708754339_bot';
 
 module.exports = function (app, opts, done) {
-  // Сценарий 1: ?contact_id=12345
-  // Сценарий 2: ?phone=79991234567&utm_source=...
-  app.get('/messenger', async (req, reply) => {
-    const { contact_id, phone, utm_source, utm_medium, utm_campaign, utm_term, utm_content } = req.query;
+  // Сценарий 1: ?cid=12345
+  // Сценарий 2: ?p=79991234567&us=...
+  app.get('/m', async (req, reply) => {
+    const contact_id = req.query.cid;
+    const phone = req.query.p || req.query.phone;
+    const utm_source = req.query.us || req.query.utm_source;
+    const utm_medium = req.query.um || req.query.utm_medium;
+    const utm_campaign = req.query.uc || req.query.utm_campaign;
+    const utm_term = req.query.ut || req.query.utm_term;
+    const utm_content = req.query.uo || req.query.utm_content;
 
     let tgPayload, maxPayload;
 
@@ -23,7 +29,7 @@ module.exports = function (app, opts, done) {
         maxPayload = 'tel' + cleanPhone;
       }
     } else {
-      return reply.code(400).send({ error: 'Требуется contact_id или phone' });
+      return reply.code(400).send({ error: 'Требуется cid или p (phone)' });
     }
 
     const tgLink = `https://t.me/${TG_BOT}?start=${tgPayload}`;
@@ -33,17 +39,21 @@ module.exports = function (app, opts, done) {
   });
 
   // Сценарий 3: лендинг с вводом телефона
-  app.get('/landing', async (req, reply) => {
-    const { utm_source, utm_medium, utm_campaign, utm_term, utm_content } = req.query;
+  app.get('/l', async (req, reply) => {
+    const utm_source = req.query.us || req.query.utm_source || '';
+    const utm_medium = req.query.um || req.query.utm_medium || '';
+    const utm_campaign = req.query.uc || req.query.utm_campaign || '';
+    const utm_term = req.query.ut || req.query.utm_term || '';
+    const utm_content = req.query.uo || req.query.utm_content || '';
 
     return reply.view('landing.ejs', {
       tgBot: TG_BOT,
       maxBot: MAX_BOT,
-      utm_source: utm_source || '',
-      utm_medium: utm_medium || '',
-      utm_campaign: utm_campaign || '',
-      utm_term: utm_term || '',
-      utm_content: utm_content || '',
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_term,
+      utm_content,
     });
   });
 
