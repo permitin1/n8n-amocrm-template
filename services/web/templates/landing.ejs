@@ -31,63 +31,39 @@
     }
     .container { width: 100%; max-width: 460px; text-align: center; }
 
-    .logo-row {
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      margin-bottom: 24px;
+    .hero {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 24px 20px; margin-bottom: 24px; box-shadow: var(--shadow);
       opacity: 0; animation: fadeIn 0.5s ease forwards;
     }
-    .logo-icon {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, #10b981, #059669);
-      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    .hero-top {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
     }
-    .logo-icon svg { width: 20px; height: 20px; }
-    .logo-text { font-size: 15px; font-weight: 600; color: var(--text-secondary); }
-
+    .hero-photo {
+      width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+      object-position: 70% 10%; flex-shrink: 0;
+    }
+    .hero-who { text-align: left; }
+    .hero-name { font-size: 14px; font-weight: 600; color: var(--text); display: block; }
+    .hero-role { font-size: 12px; color: var(--text-secondary); }
     h1 {
-      font-size: 28px; font-weight: 700; line-height: 1.2;
-      letter-spacing: -0.5px; margin-bottom: 8px;
-      opacity: 0; animation: fadeIn 0.5s ease 0.05s forwards;
+      font-size: 24px; font-weight: 700; line-height: 1.25;
+      letter-spacing: -0.3px; margin-bottom: 12px;
     }
-    .subtitle {
-      font-size: 15px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 8px;
-      opacity: 0; animation: fadeIn 0.5s ease 0.1s forwards;
+    .services {
+      display: flex; flex-wrap: wrap; gap: 6px;
     }
-    .trust {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 13px; color: var(--accent); font-weight: 500; margin-bottom: 28px;
-      opacity: 0; animation: fadeIn 0.5s ease 0.12s forwards;
+    .services span {
+      font-size: 11px; color: var(--text-secondary);
+      background: var(--bg); border-radius: 20px;
+      padding: 4px 10px; white-space: nowrap;
     }
-    .trust svg { width: 14px; height: 14px; }
+
     .label {
       font-size: 13px; font-weight: 600; color: var(--text-secondary);
       text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px;
-      opacity: 0; animation: fadeIn 0.5s ease 0.15s forwards;
+      opacity: 0; animation: fadeIn 0.5s ease 0.08s forwards;
     }
-    .services {
-      display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
-      margin-bottom: 8px;
-      opacity: 0; animation: fadeIn 0.5s ease 0.13s forwards;
-    }
-    .services span {
-      font-size: 12px; color: var(--text-secondary); background: var(--card);
-      border: 1px solid var(--border); border-radius: 20px;
-      padding: 5px 12px; white-space: nowrap;
-    }
-
-    /* Author */
-    .author {
-      display: flex; align-items: center; gap: 14px;
-      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-      padding: 14px 18px; margin-bottom: 24px; box-shadow: var(--shadow);
-      text-align: left;
-      opacity: 0; animation: fadeIn 0.5s ease 0.14s forwards;
-    }
-    .author-photo {
-      width: 52px; height: 52px; border-radius: 50%; object-fit: cover; object-position: 70% 10%; flex-shrink: 0;
-    }
-    .author-info { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
-    .author-name { font-size: 14px; font-weight: 600; color: var(--text); display: block; margin-bottom: 2px; }
 
     /* Phone */
     .phone-wrap {
@@ -214,31 +190,20 @@
 </head>
 <body>
   <div class="container">
-    <div class="logo-row">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 3L5 7.5v5.5c0 4.7 2.9 9.1 7 10.5 4.1-1.4 7-5.8 7-10.5V7.5L12 3z" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M9.5 12l2 2 3.5-3.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="hero">
+      <div class="hero-top">
+        <img class="hero-photo" src="/public/img/author.png" alt="Дарья Швецова">
+        <div class="hero-who">
+          <span class="hero-name">Дарья Швецова</span>
+          <span class="hero-role">Эксперт по страхованию</span>
+        </div>
       </div>
-      <span class="logo-text">Выгодное страхование</span>
-    </div>
-
-    <h1>Сэкономим на страховке<br>до 70%</h1>
-    <p class="subtitle">Бесплатная консультация — оставьте номер и напишите нам</p>
-    <div class="services">
-      <span>Ипотечное страхование</span>
-      <span>Потреб. кредиты</span>
-      <span>Возврат навязанных страховок</span>
-      <span>Все виды страхования</span>
-    </div>
-    <p class="trust">
-      <svg viewBox="0 0 16 16" fill="none"><path d="M8 1l2.245 4.55 5.022.73-3.633 3.541.858 5.003L8 12.675l-4.492 2.36.858-5.003L.733 6.49l5.022-.73L8 1z" fill="currentColor"/></svg>
-      Более 3 000 семей уже сэкономили
-    </p>
-
-    <div class="author">
-      <img class="author-photo" src="/public/img/author.png" alt="Дарья Швецова">
-      <div class="author-info">
-        <span class="author-name">Дарья Швецова</span>
-        Эксперт по страхованию
+      <h1>Сэкономим на страховке до 70%</h1>
+      <div class="services">
+        <span>Ипотека</span>
+        <span>Потреб. кредиты</span>
+        <span>Возврат навязанных</span>
+        <span>Все виды</span>
       </div>
     </div>
 
