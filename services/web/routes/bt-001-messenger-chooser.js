@@ -38,13 +38,13 @@ module.exports = function (app, opts, done) {
     return reply.view('messenger.ejs', { tgLink, maxLink });
   });
 
-  // Сценарий 3: лендинг с вводом телефона
+  // Сценарий 3: лендинг с вводом телефона (стандартные utm_* из рекламных систем)
   app.get('/l', async (req, reply) => {
-    const utm_source = req.query.us || req.query.utm_source || '';
-    const utm_medium = req.query.um || req.query.utm_medium || '';
-    const utm_campaign = req.query.uc || req.query.utm_campaign || '';
-    const utm_term = req.query.ut || req.query.utm_term || '';
-    const utm_content = req.query.uo || req.query.utm_content || '';
+    const utm_source = req.query.utm_source || '';
+    const utm_medium = req.query.utm_medium || '';
+    const utm_campaign = req.query.utm_campaign || '';
+    const utm_term = req.query.utm_term || '';
+    const utm_content = req.query.utm_content || '';
 
     return reply.view('landing.ejs', {
       tgBot: TG_BOT,
