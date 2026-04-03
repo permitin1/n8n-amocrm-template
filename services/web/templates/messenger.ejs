@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Выберите мессенджер — Страховка Ипотеки</title>
+  <title>Выберите мессенджер — Выгодное страхование</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -56,6 +56,16 @@
       font-size: 13px; font-weight: 600; color: var(--text-secondary);
       text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px;
       opacity: 0; animation: fadeIn 0.5s ease 0.15s forwards;
+    }
+    .services {
+      display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+      margin-bottom: 28px;
+      opacity: 0; animation: fadeIn 0.5s ease 0.13s forwards;
+    }
+    .services span {
+      font-size: 12px; color: var(--text-secondary); background: var(--card);
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 5px 12px; white-space: nowrap;
     }
 
     /* Author */
@@ -159,16 +169,22 @@
       <div class="logo-icon">
         <svg viewBox="0 0 24 24" fill="none"><path d="M12 3L5 7.5v5.5c0 4.7 2.9 9.1 7 10.5 4.1-1.4 7-5.8 7-10.5V7.5L12 3z" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M9.5 12l2 2 3.5-3.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <span class="logo-text">Страховка Ипотеки</span>
+      <span class="logo-text">Выгодное страхование</span>
     </div>
 
-    <h1>Экономия до 70%<br>на страховании ипотеки</h1>
-    <p class="subtitle">Подберём выгодный полис, принимаемый вашим банком</p>
+    <h1>Сэкономим на страховке<br>до 70%</h1>
+    <p class="subtitle">Бесплатная консультация — напишите в удобный мессенджер</p>
+    <div class="services">
+      <span>Ипотечное страхование</span>
+      <span>Потреб. кредиты</span>
+      <span>Возврат навязанных страховок</span>
+      <span>Все виды страхования</span>
+    </div>
     <div class="author">
       <img class="author-photo" src="/public/img/author.png" alt="Дарья Швецова">
       <div class="author-info">
         <span class="author-name">Дарья Швецова</span>
-        Эксперт по ипотечному страхованию
+        Эксперт по страхованию
       </div>
     </div>
 

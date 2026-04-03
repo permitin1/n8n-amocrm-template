@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Страховка Ипотеки — Консультация</title>
+  <title>Выгодное страхование — Консультация</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -63,6 +63,16 @@
       font-size: 13px; font-weight: 600; color: var(--text-secondary);
       text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px;
       opacity: 0; animation: fadeIn 0.5s ease 0.15s forwards;
+    }
+    .services {
+      display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+      margin-bottom: 8px;
+      opacity: 0; animation: fadeIn 0.5s ease 0.13s forwards;
+    }
+    .services span {
+      font-size: 12px; color: var(--text-secondary); background: var(--card);
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 5px 12px; white-space: nowrap;
     }
 
     /* Author */
@@ -208,11 +218,17 @@
       <div class="logo-icon">
         <svg viewBox="0 0 24 24" fill="none"><path d="M12 3L5 7.5v5.5c0 4.7 2.9 9.1 7 10.5 4.1-1.4 7-5.8 7-10.5V7.5L12 3z" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M9.5 12l2 2 3.5-3.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <span class="logo-text">Страховка Ипотеки</span>
+      <span class="logo-text">Выгодное страхование</span>
     </div>
 
-    <h1>Экономия до 70%<br>на страховании ипотеки</h1>
-    <p class="subtitle">Подберём выгодный полис, принимаемый вашим банком</p>
+    <h1>Сэкономим на страховке<br>до 70%</h1>
+    <p class="subtitle">Бесплатная консультация — оставьте номер и напишите нам</p>
+    <div class="services">
+      <span>Ипотечное страхование</span>
+      <span>Потреб. кредиты</span>
+      <span>Возврат навязанных страховок</span>
+      <span>Все виды страхования</span>
+    </div>
     <p class="trust">
       <svg viewBox="0 0 16 16" fill="none"><path d="M8 1l2.245 4.55 5.022.73-3.633 3.541.858 5.003L8 12.675l-4.492 2.36.858-5.003L.733 6.49l5.022-.73L8 1z" fill="currentColor"/></svg>
       Более 3 000 семей уже сэкономили
@@ -222,7 +238,7 @@
       <img class="author-photo" src="/public/img/author.png" alt="Дарья Швецова">
       <div class="author-info">
         <span class="author-name">Дарья Швецова</span>
-        Эксперт по ипотечному страхованию
+        Эксперт по страхованию
       </div>
     </div>
 
@@ -268,7 +284,7 @@
     </div>
     <button class="back-btn" id="back-btn">&#8592; Изменить номер</button>
 
-    <p class="footer">Бесплатная консультация. Работаем по всей России.</p>
+    <p class="footer">Работаем по всей России. Законно и официально.</p>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
