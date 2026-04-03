@@ -26,8 +26,11 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100dvh;
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px 16px;
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 48px 16px 24px;
+    }
+    @media (min-height: 700px) {
+      body { align-items: center; padding: 24px 16px; }
     }
     .container { width: 100%; max-width: 460px; text-align: center; }
 
