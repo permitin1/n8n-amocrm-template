@@ -31,42 +31,29 @@
     }
     .container { width: 100%; max-width: 460px; text-align: center; }
 
-    .author-row {
-      display: inline-flex; align-items: center; gap: 10px;
-      margin-bottom: 20px;
+    h1 {
+      font-size: 28px; font-weight: 800; line-height: 1.2;
+      letter-spacing: -0.5px; margin-bottom: 8px;
       opacity: 0; animation: fadeIn 0.5s ease forwards;
     }
-    .author-photo {
-      width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
-      object-position: 70% 10%;
-    }
-    .author-meta { text-align: left; }
-    .author-name { font-size: 14px; font-weight: 600; color: var(--text); display: block; line-height: 1.2; }
-    .author-role { font-size: 12px; color: var(--text-secondary); }
-
-    h1 {
-      font-size: 26px; font-weight: 700; line-height: 1.25;
-      letter-spacing: -0.3px; margin-bottom: 16px;
+    .subtitle {
+      font-size: 14px; color: var(--text-secondary); line-height: 1.5;
+      margin-bottom: 20px;
       opacity: 0; animation: fadeIn 0.5s ease 0.05s forwards;
     }
-
-    .services {
-      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
-      margin-bottom: 10px;
+    .author-card {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 14px 18px; margin-bottom: 24px; box-shadow: var(--shadow);
       opacity: 0; animation: fadeIn 0.5s ease 0.1s forwards;
     }
-    .services span {
-      font-size: 13px; font-weight: 500; color: var(--text-secondary);
-      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
-      padding: 6px 14px;
+    .author-photo {
+      width: 52px; height: 52px; border-radius: 50%; object-fit: cover;
+      object-position: 70% 10%; flex-shrink: 0;
     }
-
-    .trust {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 13px; color: var(--accent); font-weight: 500; margin-bottom: 28px;
-      opacity: 0; animation: fadeIn 0.5s ease 0.12s forwards;
-    }
-    .trust svg { width: 14px; height: 14px; }
+    .author-meta { text-align: left; }
+    .author-name { font-size: 15px; font-weight: 600; color: var(--text); display: block; line-height: 1.2; }
+    .author-status { font-size: 13px; color: #10b981; font-weight: 500; }
 
     .label {
       font-size: 13px; font-weight: 600; color: var(--text-secondary);
@@ -196,27 +183,16 @@
 </head>
 <body>
   <div class="container">
-    <div class="author-row">
+    <h1>Сэкономим на страховке до 70%</h1>
+    <p class="subtitle">Ипотека, потреб. кредиты, возврат навязанных страховок, все виды страхования</p>
+
+    <div class="author-card">
       <img class="author-photo" src="/public/img/author.png" alt="Дарья Швецова">
       <div class="author-meta">
         <span class="author-name">Дарья Швецова</span>
-        <span class="author-role">Эксперт по страхованию</span>
+        <span class="author-status">онлайн</span>
       </div>
     </div>
-
-    <h1>Сэкономим на страховке до 70%</h1>
-
-    <div class="services">
-      <span>Ипотечное страхование</span>
-      <span>Потреб. кредиты</span>
-      <span>Возврат навязанных страховок</span>
-      <span>Все виды страхования</span>
-    </div>
-
-    <p class="trust">
-      <svg viewBox="0 0 16 16" fill="none"><path d="M8 1l2.245 4.55 5.022.73-3.633 3.541.858 5.003L8 12.675l-4.492 2.36.858-5.003L.733 6.49l5.022-.73L8 1z" fill="currentColor"/></svg>
-      Более 3 000 семей уже сэкономили
-    </p>
 
     <div id="step-phone" class="step-phone">
       <p class="label">Ваш номер телефона</p>
