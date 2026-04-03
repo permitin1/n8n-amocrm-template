@@ -25,49 +25,47 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100dvh;
-      display: flex; align-items: flex-start; justify-content: center;
-      padding: 48px 16px 24px;
-    }
-    @media (min-height: 700px) {
-      body { align-items: center; padding: 24px 16px; }
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px 16px;
     }
     .container { width: 100%; max-width: 460px; text-align: center; }
 
-    .hero {
-      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
-      padding: 24px 20px; margin-bottom: 24px; box-shadow: var(--shadow);
+    .author-row {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-bottom: 20px;
       opacity: 0; animation: fadeIn 0.5s ease forwards;
     }
-    .hero-top {
-      display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    .author-photo {
+      width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+      object-position: 70% 10%;
     }
-    .hero-photo {
-      width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
-      object-position: 70% 10%; flex-shrink: 0;
-    }
-    .hero-who { text-align: left; }
-    .hero-name { font-size: 14px; font-weight: 600; color: var(--text); display: block; }
-    .hero-role { font-size: 12px; color: var(--text-secondary); }
+    .author-meta { text-align: left; }
+    .author-name { font-size: 14px; font-weight: 600; color: var(--text); display: block; line-height: 1.2; }
+    .author-role { font-size: 12px; color: var(--text-secondary); }
+
     h1 {
-      font-size: 24px; font-weight: 700; line-height: 1.25;
-      letter-spacing: -0.3px; margin-bottom: 12px;
+      font-size: 26px; font-weight: 700; line-height: 1.25;
+      letter-spacing: -0.3px; margin-bottom: 16px;
+      opacity: 0; animation: fadeIn 0.5s ease 0.05s forwards;
     }
+
     .services {
-      display: flex; flex-wrap: wrap; gap: 6px;
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      margin-bottom: 28px;
+      opacity: 0; animation: fadeIn 0.5s ease 0.1s forwards;
     }
     .services span {
-      font-size: 11px; color: var(--text-secondary);
-      background: var(--bg); border-radius: 20px;
-      padding: 4px 10px; white-space: nowrap;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 6px 14px;
     }
 
     .label {
       font-size: 13px; font-weight: 600; color: var(--text-secondary);
       text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px;
-      opacity: 0; animation: fadeIn 0.5s ease 0.08s forwards;
+      opacity: 0; animation: fadeIn 0.5s ease 0.15s forwards;
     }
 
-    /* Mobile buttons */
     .buttons-wrap {
       display: flex; flex-direction: column; gap: 12px;
       opacity: 0; animation: fadeIn 0.5s ease 0.2s forwards;
@@ -150,21 +148,21 @@
 </head>
 <body>
   <div class="container">
-    <div class="hero">
-      <div class="hero-top">
-        <img class="hero-photo" src="/public/img/author.png" alt="Дарья Швецова">
-        <div class="hero-who">
-          <span class="hero-name">Дарья Швецова</span>
-          <span class="hero-role">Эксперт по страхованию</span>
-        </div>
+    <div class="author-row">
+      <img class="author-photo" src="/public/img/author.png" alt="Дарья Швецова">
+      <div class="author-meta">
+        <span class="author-name">Дарья Швецова</span>
+        <span class="author-role">Эксперт по страхованию</span>
       </div>
-      <h1>Сэкономим на страховке до 70%</h1>
-      <div class="services">
-        <span>Ипотека</span>
-        <span>Потреб. кредиты</span>
-        <span>Возврат навязанных</span>
-        <span>Все виды</span>
-      </div>
+    </div>
+
+    <h1>Сэкономим на страховке до 70%</h1>
+
+    <div class="services">
+      <span>Ипотечное страхование</span>
+      <span>Потреб. кредиты</span>
+      <span>Возврат навязанных страховок</span>
+      <span>Все виды страхования</span>
     </div>
 
     <p class="label">Выберите мессенджер</p>
@@ -194,7 +192,7 @@
       <div class="qr-card max">
         <div class="qr-wrap">
           <canvas id="qr-max"></canvas>
-          <div class="qr-logo max"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.04.61 3.93 1.66 5.51L2 22l4.49-1.66A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z" fill="#fff"/><circle cx="13.5" cy="11" r="3.5" fill="rgba(255,255,255,0.4)"/></svg></div>
+          <div class="qr-logo max"><svg viewBox="0 0 44 44" fill="none"><path d="M22.47 41.88c-4.11 0-6.02-.6-9.34-3-2.1 2.7-8.75 4.81-9.04 1.2 0-2.71-.6-5-1.28-7.5C2 29.5 1.08 26.07 1.08 21.1 1.08 9.23 9.82.3 21.36.3c11.55 0 20.6 9.37 20.6 20.91a20.6 20.6 0 0 1-20.49 20.67zm.17-31.32c-5.62-.29-10 3.6-10.97 9.7-.8 5.05.62 11.2 1.83 11.52.58.14 2.04-1.04 2.95-1.95a10.4 10.4 0 0 0 5.08 1.81 10.7 10.7 0 0 0 11.19-9.97 10.7 10.7 0 0 0-10.08-11.1z" fill="#fff"/></svg></div>
           <span class="qr-card-label">MAX</span>
         </div>
         <span class="qr-link"><a href="<%= maxLink %>">Открыть ссылку</a></span>
